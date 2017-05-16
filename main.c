@@ -53,8 +53,8 @@ void main(void)
         /* enable TA0 interrupts for samples of wave */
         maxSample = 0;      /*reset to find vals over the next sample taken*/
         minSample = 5000;
-        numSample = 0;
-        while(numSample < 2000) {
+        numSamples = 0;
+        while(numSamples < 2000) {
             /* take samples handles by TA interrupt */
         }
         /*disable TA0 interrupts*/
@@ -85,7 +85,7 @@ void setup_TA0_Int(void) {
 
     TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE; // TACCR0 interrupt enabled
 
-    TIMER_A0->CCR[0] = setSampleRate;
+    TIMER_A0->CCR[0] = sampleRate;
 
     NVIC->ISER[0] = 1 << ((TA0_0_IRQn) & 31); //enable timer A interrupt (A0)
 }
@@ -100,8 +100,8 @@ void TA0_0_IRQHandler(void) {
     sampleADC = getSample();
     /*add to table*/
 
-    numSample++;
-    TIMER_A0->CCR[0] += setSampleRate //set to collect next sample
+    numSamples++;
+    TIMER_A0->CCR[0] += sampleRate; //set to collect next sample
 }
 
 
