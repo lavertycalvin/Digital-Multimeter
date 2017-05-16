@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>Digital-Multimeter</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+	</natures>
+	<variableList>
+		<variable>
+			<name>msp</name>
+			<value>file:/opt/ti/ccsv7/ccs_base/arm/include/msp.h</value>
+		</variable>
+	</variableList>
+</projectDescription>

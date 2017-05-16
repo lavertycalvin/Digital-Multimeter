@@ -20,3 +20,20 @@ float voltPP(float maxVolt, float minVolt) {
 int getDCOffset(int max, int min) {
     return (max + min)/2;
 }
+
+/* if Vpp < 500 mV, the waveform is DC */
+int isDC(int maxVal, int minVal) {
+    if(maxVal - minVal < 500) {
+        return 1;
+    }
+    return 0;
+}
+
+
+void fillSamples(int index, int sample) {
+
+}
+
+int getAverage(void) {
+
+}
