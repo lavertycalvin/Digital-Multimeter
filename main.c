@@ -25,7 +25,7 @@ int maxSample = 0;
 int minSample = 5000;
 
 int sampleRate = 0;
-int numSamples = 0;
+volatile int numSamples = 0;
 
 void main(void)
 {
@@ -49,14 +49,19 @@ void main(void)
     SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk;   // Wake up on exit from ISR
 
     while(1) {
-        /* take 1000, 1ms samples */
-        /* make measurements */
+        /* take 2000, .005 ms samples */
+        /* enable TA0 interrupts for samples of wave */
+        maxSample = 0;      /*reset to find vals over the next sample taken*/
+        minSample = 5000;
+        numSample = 0;
+        while(numSample < 2000) {
+            /* take samples handles by TA interrupt */
+        }
+        /*disable TA0 interrupts*/
+        /*make all calculations to display*/
 
-        while(!getReady()){} /* wait for the conversion to complete in ISR */
-        sampleADC = getSample();
-        //voltOut(sampleADC);
-        //clearScreen();
-        //print(acVolt, sampleADC, freq);
+        /*write out all info to the screen*/
+
 
         // Start sampling/conversion
         ADC14->CTL0 |= ADC14_CTL0_ENC | ADC14_CTL0_SC;
@@ -80,15 +85,22 @@ void setup_TA0_Int(void) {
 
     TIMER_A0->CCTL[0] |= TIMER_A_CCTLN_CCIE; // TACCR0 interrupt enabled
 
-    TIMER_A0->CCR[0] = 600;
+    TIMER_A0->CCR[0] = setSampleRate;
 
     NVIC->ISER[0] = 1 << ((TA0_0_IRQn) & 31); //enable timer A interrupt (A0)
 }
 
-/* handles TA0 Interrrupt */
+/* handles TA0 Interrupt */
 void TA0_0_IRQHandler(void) {
     TIMER_A0->CCTL[0] &= ~TIMER_A_CCTLN_CCIFG; //clear the flag
+    /* Start NEXT sampling/conversion */
+    ADC14->CTL0 |= ADC14_CTL0_ENC | ADC14_CTL0_SC;
 
+    while(!getReady()){} /* wait for the conversion to complete in ADC ISR */
+    sampleADC = getSample();
+    /*add to table*/
+
+    numSample++;
     TIMER_A0->CCR[0] += setSampleRate //set to collect next sample
 }
 
