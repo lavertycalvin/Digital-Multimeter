@@ -1,7 +1,7 @@
 #include "msp.h"
 
 /* Location Defs for printing*/
-#define TITLEX      35
+#define TITLEX      30
 #define TITLEY      0
 #define DCVOLTX     8
 #define DCVOLTY     5
@@ -11,6 +11,8 @@
 #define DCGRAPHY    10
 #define ACGRAPHX    40
 #define ACGRAPHY    10
+#define FREQX       50
+#define FREQY       6
 
 #define GRAPHLENGTH 20
 
@@ -82,8 +84,7 @@ void initTerminal(int ac, int dc, int freq) {
     printACVolt(ac);
     printDCGraph(dc);
     printACGraph(ac);
-    //printFreq(freq);
-    //printValues(dc,ac,freq);
+    printFreq(freq);
     //printGraphs(dc,ac);
 }
 
@@ -95,18 +96,20 @@ void printTitle(void){
 void printDCVolt(int dc) {
     moveCursor(DCVOLTX, DCVOLTY);
     sendUART("DC Voltage: ", 12);
+    voltOut(dc);
 }
 
 void printACVolt(int ac) {
     moveCursor(ACVOLTX, ACVOLTY);
     sendUART("AC Voltage: ", 12);
+    voltOut(ac);
 }
 
 void printDCGraph(int dc) {
     int count;
     int DC_bar = (int)((dc /3300.0) * GRAPHLENGTH);
     moveCursor(DCGRAPHX, DCGRAPHY);
-    sendUART("|", 1);
+    sendUART(" |", 2);
     for(count = 0;count < DC_bar; count++){
        sendUART("#", 1);
     }
@@ -116,7 +119,7 @@ void printDCGraph(int dc) {
     sendUART("|" , 1);
     moveCursor(DCGRAPHX, DCGRAPHY + 1);
     sendUART("0.0", 3);
-    for(count = 0; count < GRAPHLENGTH; count++) {
+    for(count = 0; count < GRAPHLENGTH-2; count++) {
         sendUART(" ", 1);
     }
     sendUART("3.3", 3);
@@ -126,7 +129,7 @@ void printACGraph(int ac) {
     int count;
     int AC_bar = (int)((ac /3300.0) * GRAPHLENGTH);
     moveCursor(ACGRAPHX, ACGRAPHY);
-    sendUART("|", 1);
+    sendUART(" |", 2);
     for(count = 0;count < AC_bar; count++){
        sendUART("#", 1);
     }
@@ -136,24 +139,15 @@ void printACGraph(int ac) {
     sendUART("|" , 1);
     moveCursor(ACGRAPHX, ACGRAPHY + 1);
     sendUART("0.0", 3);
-    for(count = 0; count < GRAPHLENGTH; count++) {
+    for(count = 0; count < GRAPHLENGTH-2; count++) {
         sendUART(" ", 1);
     }
     sendUART("3.3", 3);
 }
 
 void printFreq(int freq) {
-
-}
-void printValues(int dc, int ac, int freq){
-    moveCursor(0,2);
-    sendUART("Voltage DC: ", 12);
-    voltOut(dc);
-    moveCursor(0,3);
-    sendUART("Voltage AC: ", 12);
-    voltOut(ac);
-    moveCursor(0,4);
-    sendUART("Frequency : ", 12);
+    moveCursor(FREQX, FREQY);
+    sendUART("Frequency :  ", 13);
     freqOut(freq);
 }
 
@@ -186,4 +180,13 @@ void freqOut(int writeOut) {
             multiplier /= 10; /*shift over by 10 */
     }
     sendUART(freq, 4);
+}
+
+void updateTerminal(int dcVolt, int acVPP, int acRMSVolt, int acTRUERMSVolt, int freq) {
+    printDCVolt(dcVolt);
+    printACVolt(acVPP);
+    printDCGraph(dcVolt);
+    printACGraph(acVPP);
+    printFreq(freq);
+    //printGraphs(dc,ac);
 }

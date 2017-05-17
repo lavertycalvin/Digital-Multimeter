@@ -15,11 +15,6 @@ void ADC14_IRQHandler(void) {
     setSampleReady();
 }
 
-void enableADCInt(void) {
-    // Enable ADC interrupt in NVIC module
-    NVIC->ISER[0] = 1 << ((ADC14_IRQn) & 31);
-}
-
 void setupADC(void) {
     // Sampling time, S&H=16, ADC14 on
     ADC14->CTL0 = ADC14_CTL0_SHT0_2 | ADC14_CTL0_SHP | ADC14_CTL0_ON;
@@ -27,6 +22,8 @@ void setupADC(void) {
 
     ADC14->MCTL[0] |= ADC14_MCTLN_INCH_1;   // A1 ADC input select; Vref=AVCC
     ADC14->IER0 |= ADC14_IER0_IE0;          // Enable ADC conv complete interrupt
+
+    NVIC_EnableIRQ(ADC14_IRQn);      // Enable ADC interrupt in NVIC module
 }
 
 void setSampleReady(void) {
