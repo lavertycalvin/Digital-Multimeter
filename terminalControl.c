@@ -4,15 +4,15 @@
 #define TITLEX      5
 #define TITLEY      0
 #define DCVOLTX     0
-#define DCVOLTY     4
+#define DCVOLTY     5
 #define ACVOLTX     0
-#define ACVOLTY     3
+#define ACVOLTY     11
 #define DCGRAPHX    0
-#define DCGRAPHY    6
+#define DCGRAPHY    7
 #define ACGRAPHX    0
-#define ACGRAPHY    7
+#define ACGRAPHY    13
 #define FREQX       0
-#define FREQY       4
+#define FREQY       2
 
 #define GRAPHLENGTH 20
 
@@ -103,6 +103,10 @@ void printTitle(void){
 
 void printDCVolt(int dc) {
     if(!check){
+       moveCursor(DCGRAPHX, DCGRAPHY-3);
+       for(count = 0; count < GRAPHLENGTH; count++) {
+          sendUART("-", 1);
+       }
        moveCursor(DCVOLTX, DCVOLTY);
        sendUART("DC Voltage: ", 12);
        voltOut(dc);
@@ -116,6 +120,10 @@ void printDCVolt(int dc) {
 
 void printACVolt(int ac) {
     if(!check){
+       moveCursor(ACGRAPHX, ACGRAPHY-3);
+       for(count = 0; count < GRAPHLENGTH; count++) {
+          sendUART("-", 1);
+       }
        moveCursor(ACVOLTX, ACVOLTY);
        sendUART("AC Voltage: ", 12);
        voltOut(ac);
@@ -128,6 +136,10 @@ void printACVolt(int ac) {
 
 void printTrueRMSVolt(int TrueRMS) {
     if(!check){
+       moveCursor(ACGRAPHY, ACGRAPHY+3);
+       for(count = 0; count < GRAPHLENGTH; count++) {
+          sendUART("-", 1);
+       }
        moveCursor(ACVOLTX, ACVOLTY+1);
        sendUART("True RMS: ", 12);
        voltOut(TrueRMS);
@@ -151,6 +163,12 @@ void printDCGraph(int dc) {
         sendUART(" ", 1);
     }
     sendUART("|" , 1);
+    moveCursor(DCGRAPHX, DCGRAPHY);
+    sendUART("0.0", 3);
+    for(count = 0; count < GRAPHLENGTH-2; count++) {
+        sendUART(" ", 1);
+    }
+    sendUART("3.3", 3);
 }
 
 void printACGraph(int ac) {
@@ -166,6 +184,12 @@ void printACGraph(int ac) {
         sendUART(" ", 1);
     }
     sendUART("|" , 1);
+    moveCursor(ACGRAPHX, ACGRAPHY);
+    sendUART("0.0", 3);
+    for(count = 0; count < GRAPHLENGTH-2; count++) {
+        sendUART(" ", 1);
+    }
+    sendUART("3.3", 3);
 }
 
 
