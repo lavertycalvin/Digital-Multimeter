@@ -1,18 +1,22 @@
 #include "msp.h"
 
 /* Location Defs for printing*/
-#define TITLEX      5
+#define TITLEX      29
 #define TITLEY      0
 #define DCVOLTX     0
-#define DCVOLTY     5
-#define ACVOLTX     0
-#define ACVOLTY     11
+#define DCVOLTY     6
+#define ACVOLTX     31
+#define ACVOLTY     6
+#define RMSVOLTX    58
+#define RMSVOLTY    6
 #define DCGRAPHX    0
-#define DCGRAPHY    7
-#define ACGRAPHX    0
-#define ACGRAPHY    13
+#define DCGRAPHY    8
+#define ACGRAPHX    29
+#define ACGRAPHY    8
+#define RMSGRAPHX   56
+#define RMSGRAPHY   8
 #define FREQX       0
-#define FREQY       2
+#define FREQY       3
 
 #define GRAPHLENGTH 20
 
@@ -82,16 +86,17 @@ void clearScreen(void){
 }
 
 /* set up interface for the terminal */
-void initTerminal(int ac, iint dc, int freq) {
+void initTerminal(int ac, int dc, int freq) {
     clearScreen();
     printTitle();
     printDCVolt(dc);
     printACVolt(ac);
-    printTrueRMSVolt(0);
+    printCalcRMSVolt(0);
     printDCGraph(dc);
     printACGraph(ac);
     printRMSGraph(0);
     printFreq(freq);
+    printTrueRMS(0);
     check = 1;
     //printGraphs(dc,ac);
 }
@@ -102,60 +107,63 @@ void printTitle(void){
 }
 
 void printDCVolt(int dc) {
+    int count;
     if(!check){
-       moveCursor(DCGRAPHX, DCGRAPHY-3);
+       moveCursor(DCGRAPHX+3, DCGRAPHY-3);
        for(count = 0; count < GRAPHLENGTH; count++) {
           sendUART("-", 1);
        }
-       moveCursor(DCVOLTX, DCVOLTY);
+       moveCursor(DCVOLTX+5, DCVOLTY);
        sendUART("DC Voltage: ", 12);
        voltOut(dc);
     } 
     else{
-       moveCursor(DCVOLTX + 13, DCVOLTY);
+       moveCursor(DCVOLTX + 17, DCVOLTY);
        voltOut(dc);
 
     }
 }
 
 void printACVolt(int ac) {
+    int count;
     if(!check){
-       moveCursor(ACGRAPHX, ACGRAPHY-3);
+       moveCursor(ACGRAPHX+2, ACGRAPHY-3);
        for(count = 0; count < GRAPHLENGTH; count++) {
           sendUART("-", 1);
        }
-       moveCursor(ACVOLTX, ACVOLTY);
+       moveCursor(ACVOLTX+2, ACVOLTY);
        sendUART("AC Voltage: ", 12);
        voltOut(ac);
     }
     else{
-       moveCursor(ACVOLTX + 12, ACVOLTY);
+       moveCursor(ACVOLTX + 14, ACVOLTY);
        voltOut(ac);
     }   
 }
 
-void printTrueRMSVolt(int TrueRMS) {
+void printCalcRMSVolt(int calcRMS) {
+    int count;
     if(!check){
-       moveCursor(ACGRAPHY, ACGRAPHY+3);
+       moveCursor(RMSVOLTX, RMSVOLTY-1);
        for(count = 0; count < GRAPHLENGTH; count++) {
           sendUART("-", 1);
        }
-       moveCursor(ACVOLTX, ACVOLTY+1);
-       sendUART("True RMS: ", 12);
-       voltOut(TrueRMS);
+       moveCursor(RMSVOLTX+2, RMSVOLTY);
+       sendUART("Calc RMS: ", 12);
+       voltOut(calcRMS);
     }
     else{
-       moveCursor(ACVOLTX + 11, ACVOLTY);
-       voltOut(TrueRMS);
+       moveCursor(RMSVOLTX + 13, RMSVOLTY);
+       voltOut(calcRMS);
     }   
 }
 
 void printDCGraph(int dc) {
     int count;
     int DC_bar = (int)((dc /3300.0) * GRAPHLENGTH);
-    moveCursor(DCGRAPHX, DCGRAPHY);
+    moveCursor(DCGRAPHX+1, DCGRAPHY-1);
     sendUART(" |", 2);
-    clearRightOf(void);
+    clearRightOf();
     for(count = 0;count < DC_bar; count++){
        sendUART("#", 1);
     }
@@ -163,9 +171,9 @@ void printDCGraph(int dc) {
         sendUART(" ", 1);
     }
     sendUART("|" , 1);
-    moveCursor(DCGRAPHX, DCGRAPHY);
+    moveCursor(DCGRAPHX+1, DCGRAPHY);
     sendUART("0.0", 3);
-    for(count = 0; count < GRAPHLENGTH-2; count++) {
+    for(count = 0; count < GRAPHLENGTH-1; count++) {
         sendUART(" ", 1);
     }
     sendUART("3.3", 3);
@@ -174,9 +182,9 @@ void printDCGraph(int dc) {
 void printACGraph(int ac) {
     int count;
     int AC_bar = (int)((ac /3300.0) * GRAPHLENGTH);
-    moveCursor(ACGRAPHX, ACGRAPHY);
+    moveCursor(ACGRAPHX, ACGRAPHY-1);
     sendUART(" |", 2);
-    clearRightOf(void);
+    clearRightOf();
     for(count = 0;count < AC_bar; count++){
        sendUART("#", 1);
     }
@@ -196,9 +204,9 @@ void printACGraph(int ac) {
 void printRMSGraph(int TrueRMS) {
     int count;
     int RMS_bar = (int)((TrueRMS /3300.0) * GRAPHLENGTH);
-    moveCursor(ACGRAPHX, ACGRAPHY+1);
+    moveCursor(RMSGRAPHX, RMSGRAPHY-1);
     sendUART(" |", 2);
-    clearRightOf(void);
+    clearRightOf();
     for(count = 0;count < RMS_bar; count++){
        sendUART("#", 1);
     }
@@ -206,7 +214,7 @@ void printRMSGraph(int TrueRMS) {
         sendUART(" ", 1);
     }
     sendUART("|" , 1);
-    moveCursor(ACGRAPHX, ACGRAPHY + 2);
+    moveCursor(RMSGRAPHX, RMSGRAPHY);
     sendUART("0.0", 3);
     for(count = 0; count < GRAPHLENGTH-2; count++) {
         sendUART(" ", 1);
@@ -224,6 +232,18 @@ void printFreq(int freq) {
        moveCursor(FREQX+13, FREQY);
        freqOut(freq);
     }   
+}
+
+void printTrueRMS(int freq) {
+    if(!check){
+       moveCursor(FREQX + 20, FREQY);
+       sendUART("Calc RMS: ",10);
+       freqOut(freq);
+    }
+    else{
+       moveCursor(FREQX + 30, FREQY);
+       voltOut(freq);
+    }:q:
 }
 
 void voltOut(int writeOut) {
@@ -260,10 +280,10 @@ void freqOut(int writeOut) {
 void updateTerminal(int dcVolt, int acVPP, int acRMSVolt, int acTRUERMSVolt, int freq) {
     printDCVolt(dcVolt);
     printACVolt(acVPP);
-    printTrueRMSVolt(acTRUERMSVolt);
+    printCalcRMSVolt(acRMSVolt);
     printDCGraph(dcVolt);
     printACGraph(acVPP);
-    printRMSGraph(acTRUERMSVolt);
+    printRMSGraph(acRMSVolt);
     printFreq(freq);
-    //printGraphs(dc,ac);
-}
+    printTrueRMS(acTRUERMSVolt);
+   }
